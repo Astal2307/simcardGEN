@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0E0F12">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SIMRUSH">
+<title>SIMRUSH</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Onest:wght@400;500;600&family=Unbounded:wght@500;600;700&display=swap">
+<style>
+:root{--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#08090B;overscroll-behavior:none}
+body{touch-action:manipulation;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+button{font-family:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0;margin:0;font-size:inherit}
+button:disabled{cursor:default}
+
+.app{position:fixed;top:0;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;overflow:hidden;background:#0E0F12;color:#ECEDEF;font-family:'Onest',system-ui,-apple-system,sans-serif}
+.mono{font-family:'IBM Plex Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+.disp{font-family:'Unbounded','Arial Black',system-ui,sans-serif}
+.tnum{font-variant-numeric:tabular-nums}
+
+.hdr{position:absolute;top:0;left:0;right:0;height:calc(64px + var(--st));padding:var(--st) 16px 0;display:flex;align-items:center;justify-content:space-between;z-index:5;background:#0E0F12}
+.logo{display:flex;align-items:center;gap:8px;font-weight:700;font-size:17px;letter-spacing:.02em}
+.bal{display:flex;align-items:center;height:44px;border-radius:22px;background:#17191E;border:1px solid #23262D;padding-left:14px;gap:6px}
+.bal-v{font-weight:600;font-size:15px;white-space:nowrap}
+.ib{width:42px;height:42px;border-radius:21px;display:flex;align-items:center;justify-content:center;flex:none;transition:background .15s}
+.ib:active{background:#23262D}
+
+.scr{position:absolute;top:calc(64px + var(--st));bottom:calc(76px + var(--sb));left:0;right:0;overflow-y:auto;overflow-x:hidden;padding:4px 16px 20px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.scr::-webkit-scrollbar,.chips::-webkit-scrollbar{display:none}
+.col{display:flex;flex-direction:column}
+
+.nav{position:absolute;bottom:0;left:0;right:0;height:calc(76px + var(--sb));padding:0 8px calc(8px + var(--sb));border-top:1px solid #1E2127;background:#0E0F12;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));z-index:5}
+.nb{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#7D828B;font-size:11px;font-weight:500;transition:color .2s}
+.nb.on{color:#ECEDEF}
+.nb.on::before{content:'';position:absolute;top:-1px;left:50%;width:24px;margin-left:-12px;height:2px;border-radius:2px;background:#ECEDEF}
+
+/* rarity */
+.c-common{color:#9AA0A8}.c-uncommon{color:#5BC98A}.c-rare{color:#4C8DFF}.c-epic{color:#A66BFF}.c-legendary{color:#F5B83D}
+.bg-common{background:#9AA0A8}.bg-uncommon{background:#5BC98A}.bg-rare{background:#4C8DFF}.bg-epic{background:#A66BFF}.bg-legendary{background:#F5B83D}
+.t-common{background:rgba(154,160,168,.12);color:#AEB3BA}.t-uncommon{background:rgba(91,201,138,.12);color:#5BC98A}.t-rare{background:rgba(76,141,255,.14);color:#6FA3FF}.t-epic{background:rgba(166,107,255,.15);color:#B78AFF}.t-legendary{background:rgba(245,184,61,.14);color:#F5B83D}
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
+.tag{font-size:11px;font-weight:600;padding:4px 8px;border-radius:8px;white-space:nowrap;flex:none}
+
+/* stage */
+.stage{height:340px;border-radius:24px;background-color:#121419;background-image:radial-gradient(#1F2229 1px,transparent 1px);background-size:14px 14px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.scaler{position:absolute;left:0;top:0;width:326px;height:206px;transform-origin:0 0}
+.cw{position:absolute;inset:0}
+.co{position:absolute;inset:0;border-radius:18px;clip-path:polygon(0 0,calc(100% - 36px) 0,100% 36px,100% 100%,0 100%);background:#2A2D35;transition:background .35s}
+.ci{position:absolute;inset:1.5px;border-radius:16.5px;clip-path:polygon(0 0,calc(100% - 35.4px) 0,100% 35.4px,100% 100%,0 100%);background:#16181D;overflow:hidden;padding:22px 20px;display:flex;flex-direction:column;justify-content:space-between}
+.chip{width:46px;height:36px;border-radius:7px;flex:none;background-color:#6E727B;background-image:linear-gradient(#4E525A,#4E525A),linear-gradient(#4E525A,#4E525A),linear-gradient(#4E525A,#4E525A);background-size:100% 1.5px,100% 1.5px,1.5px 100%;background-position:0 11px,0 23px,22px 0;background-repeat:no-repeat}
+.b-spin{background:#3A3E47}
+.b-common{background:#454952}.b-uncommon{background:#5BC98A}.b-rare{background:#4C8DFF}.b-epic{background:#A66BFF}.b-legendary{background:#F5B83D}
+
+.cw.spin{animation:hum .5s ease-in-out infinite}
+.fx-uncommon{animation:p1 .4s ease-out}
+.fx-rare{animation:p2 .45s ease-out}
+.fx-epic{animation:p3 .6s ease-out}
+.fx-legendary{animation:shake .75s ease-out}
+@keyframes hum{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes p1{40%{transform:scale(1.025)}}
+@keyframes p2{35%{transform:scale(1.04)}}
+@keyframes p3{30%{transform:scale(1.06) rotate(-.6deg)}60%{transform:scale(.99)}}
+@keyframes shake{10%{transform:translateX(-4px) rotate(-.8deg)}20%{transform:translateX(4px) rotate(.8deg)}30%{transform:translateX(-3px)}42%{transform:scale(1.07)}70%{transform:scale(.99)}100%{transform:none}}
+
+.num{display:flex;align-items:center;font-weight:600;font-size:24px;line-height:1;color:#ECEDEF}
+.pfx{color:#7D828B;margin-right:8px;flex:none}
+.sep{width:17px;text-align:center;color:#7D828B;flex:none}
+.gp{width:8px;flex:none}
+.dg{width:17px;height:34px;display:flex;align-items:center;justify-content:center;flex:none}
+.dg-in{display:block}
+.d-idle{color:#3A3E46}
+.d-roll{overflow:hidden;color:#8A8F98}
+.d-roll .dg-in{animation:roll .11s linear infinite}
+.d-lock{transition:color .35s}
+.d-lock .dg-in{animation:lock .45s cubic-bezier(.2,1.6,.4,1)}
+.r-uncommon .d-lock{color:#5BC98A}.r-rare .d-lock{color:#6FA3FF}.r-epic .d-lock{color:#B78AFF}
+.r-legendary .d-lock{color:#F5B83D;text-shadow:0 0 12px rgba(245,184,61,.5)}
+@keyframes roll{0%{transform:translateY(-60%);opacity:.25}50%{opacity:1}100%{transform:translateY(60%);opacity:.25}}
+@keyframes lock{0%{transform:translateY(-70%) scale(1.25);opacity:0;filter:blur(3px)}100%{transform:none;opacity:1;filter:none}}
+
+.ring{position:absolute;inset:0;border-radius:20px;border:2px solid;opacity:0;pointer-events:none;animation:ring 1.1s cubic-bezier(.2,.7,.3,1) both}
+.ring-uncommon{border-color:#5BC98A}.ring-rare{border-color:#4C8DFF}.ring-epic{border-color:#A66BFF}.ring-legendary{border-color:#F5B83D}
+@keyframes ring{0%{transform:scale(1);opacity:.75}100%{transform:scale(1.22);opacity:0}}
+.pts{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none}
+.pw{position:absolute;left:0;top:0;width:0;height:0}
+.pt{position:absolute;left:-3px;top:-3px;width:6px;height:6px;border-radius:2px;opacity:0}
+.fa{animation:fa .85s cubic-bezier(.15,.7,.3,1) both}
+.fb{animation:fb .95s cubic-bezier(.15,.7,.3,1) both}
+.fc{animation:fc 1.05s cubic-bezier(.15,.7,.3,1) both}
+@keyframes fa{0%{transform:translateY(0) scale(1.2);opacity:1}100%{transform:translateY(-105px) scale(.3);opacity:0}}
+@keyframes fb{0%{transform:translateY(0) scale(1.2);opacity:1}100%{transform:translateY(-140px) scale(.3);opacity:0}}
+@keyframes fc{0%{transform:translateY(0) scale(1.2);opacity:1}100%{transform:translateY(-175px) scale(.3);opacity:0}}
+.sw{position:absolute;top:-30%;bottom:-30%;width:70px;left:-40%;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.16),rgba(255,255,255,0));transform:skewX(-18deg);animation:sweep 1s .15s ease-out both;pointer-events:none}
+@keyframes sweep{from{left:-40%}to{left:130%}}
+
+.rinfo{height:54px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.rl{font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.rv{display:flex;align-items:center;gap:6px;font-size:20px;font-weight:600}
+.up{animation:up .45s cubic-bezier(.2,.8,.3,1) both}
+.up2{animation:up .45s .12s cubic-bezier(.2,.8,.3,1) both}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.spin-btn{margin-top:16px;width:100%;height:60px;border-radius:18px;background:#ECEDEF;color:#0E0F12;display:flex;align-items:center;justify-content:space-between;padding:0 22px;transition:transform .12s,opacity .2s}
+.spin-btn:active:not(:disabled){transform:scale(.98)}
+.spin-btn:disabled{opacity:.45}
+.grid5{margin-top:12px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pill{height:34px;border-radius:10px;background:#15171B;border:1px solid #1E2127;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:600;color:#C5C8CE;white-space:nowrap;overflow:hidden}
+.lbl{font-size:12px;color:#7D828B;font-weight:500}
+
+.card{background:#15171B;border:1px solid #1E2127;border-radius:16px}
+.stat{padding:14px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.stat-v{font-size:18px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:14px -16px 0;padding:0 16px;scrollbar-width:none}
+.chip-f{flex:none;height:40px;padding:0 14px;border-radius:20px;border:1px solid #23262D;font-size:13px;font-weight:500;color:#AEB2B9;display:flex;align-items:center;gap:7px;white-space:nowrap;transition:background .2s,color .2s,border-color .2s}
+.chip-f.on{background:#ECEDEF;color:#0E0F12;border-color:#ECEDEF}
+.list{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.row{width:100%;height:66px;border-radius:16px;background:#15171B;border:1px solid #1E2127;display:flex;align-items:center;gap:12px;padding:0 16px;text-align:left;transition:background .15s}
+.row:active{background:#1A1C21}
+.rb{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none}
+.grow{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.ell{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.val{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:600;white-space:nowrap;flex:none}
+.empty{padding:48px 0;text-align:center;color:#7D828B;font-size:14px}
+
+.seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));height:44px;padding:4px;border-radius:14px;background:#15171B;border:1px solid #1E2127}
+.sg{border-radius:10px;font-size:14px;font-weight:600;color:#7D828B;transition:background .2s,color .2s}
+.sg.on{background:#262930;color:#ECEDEF}
+
+.lot{background:#15171B;border:1px solid #1E2127;border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.lr{display:flex;align-items:center;justify-content:space-between;gap:8px 10px}
+.lr.wrap{flex-wrap:wrap}
+.lr.end{align-items:flex-end}
+.ln{font-size:17px;font-weight:600;white-space:nowrap}
+.meta{font-size:13px;color:#8A8F98}
+.av-s{width:22px;height:22px;border-radius:50%;background:#23262D;color:#C5C8CE;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex:none}
+.timer{display:flex;align-items:center;gap:5px;flex:none}
+.urg{color:#FF9A5C}
+.bidv{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:600;white-space:nowrap}
+.bb{height:44px;padding:0 16px;border-radius:12px;background:#ECEDEF;color:#0E0F12;font-size:14px;font-weight:600;white-space:nowrap;flex:none;transition:opacity .2s,transform .12s}
+.bb:active:not(:disabled){transform:scale(.97)}
+.bb:disabled{opacity:.4}
+.bb.ghost{background:transparent;color:#ECEDEF;border:1px solid #2E323A}
+.bb.ghost:disabled{opacity:1}
+
+.hero{padding:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:20px}
+.rk{height:60px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:14px;border:1px solid transparent}
+.rk.me{background:#1B1E24;border-color:#2E323A}
+.rk-n{width:26px;text-align:center;font-size:13px;font-weight:600;color:#7D828B;flex:none}
+.rk-n.top{color:#ECEDEF}
+.av{width:36px;height:36px;border-radius:50%;background:#23262D;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:14px;color:#C5C8CE;flex:none}
+
+.ov{position:absolute;inset:0;width:100%;height:100%;background:rgba(5,6,8,.62);z-index:20;animation:fade .2s both}
+.sh{position:absolute;left:0;right:0;bottom:0;z-index:21;background:#15171B;border-top:1px solid #23262D;border-radius:24px 24px 0 0;padding:10px 20px calc(28px + var(--sb));display:flex;flex-direction:column;gap:18px;animation:slide .32s cubic-bezier(.2,.9,.3,1) both}
+.grab{width:36px;height:4px;border-radius:2px;background:#2E323A;align-self:center}
+.stepper{display:flex;align-items:center;gap:4px;background:#0E0F12;border:1px solid #23262D;border-radius:14px;padding:2px}
+.btn1{height:56px;border-radius:16px;background:#ECEDEF;color:#0E0F12;font-size:15px;font-weight:600}
+.btn2{height:52px;border-radius:14px;border:1px solid #2E323A;display:flex;align-items:center;justify-content:space-between;padding:0 18px;font-size:15px;font-weight:600}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes slide{from{transform:translateY(100%)}to{transform:none}}
+
+.toast{position:absolute;top:calc(68px + var(--st));left:16px;right:16px;z-index:30;height:48px;border-radius:14px;background:#1E2127;border:1px solid #2A2D35;display:flex;align-items:center;gap:10px;padding:0 16px;font-size:14px;font-weight:500;animation:toast 2.5s both;pointer-events:none}
+@keyframes toast{0%{opacity:0;transform:translateY(-12px)}10%,84%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px)}}
+
+@media (hover:hover){
+  .row:hover{background:#1A1C21}
+  .ib:hover{background:#23262D}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+const { html, render, Component } = await import('data:text/javascript;base64,dmFyIGUsbixfLHQsbyxyLHUsbD17fSxpPVtdLGM9L2FjaXR8ZXgoPzpzfGd8bnxwfCQpfHJwaHxncmlkfG93c3xtbmN8bnR3fGluZVtjaF18em9vfF5vcmR8aXRlcmEvaTtmdW5jdGlvbiBzKGUsbil7Zm9yKHZhciBfIGluIG4pZVtfXT1uW19dO3JldHVybiBlfWZ1bmN0aW9uIGYoZSl7dmFyIG49ZS5wYXJlbnROb2RlO24mJm4ucmVtb3ZlQ2hpbGQoZSl9ZnVuY3Rpb24gYShuLF8sdCl7dmFyIG8scix1LGw9e307Zm9yKHUgaW4gXykia2V5Ij09dT9vPV9bdV06InJlZiI9PXU/cj1fW3VdOmxbdV09X1t1XTtpZihhcmd1bWVudHMubGVuZ3RoPjImJihsLmNoaWxkcmVuPWFyZ3VtZW50cy5sZW5ndGg+Mz9lLmNhbGwoYXJndW1lbnRzLDIpOnQpLCJmdW5jdGlvbiI9PXR5cGVvZiBuJiZudWxsIT1uLmRlZmF1bHRQcm9wcylmb3IodSBpbiBuLmRlZmF1bHRQcm9wcyl2b2lkIDA9PT1sW3VdJiYobFt1XT1uLmRlZmF1bHRQcm9wc1t1XSk7cmV0dXJuIHAobixsLG8scixudWxsKX1mdW5jdGlvbiBwKGUsdCxvLHIsdSl7dmFyIGw9e3R5cGU6ZSxwcm9wczp0LGtleTpvLHJlZjpyLF9fazpudWxsLF9fOm51bGwsX19iOjAsX19lOm51bGwsX19kOnZvaWQgMCxfX2M6bnVsbCxfX2g6bnVsbCxjb25zdHJ1Y3Rvcjp2b2lkIDAsX192Om51bGw9PXU/KytfOnV9O3JldHVybiBudWxsIT1uLnZub2RlJiZuLnZub2RlKGwpLGx9ZnVuY3Rpb24gaChlKXtyZXR1cm4gZS5jaGlsZHJlbn1mdW5jdGlvbiBkKGUsbil7dGhpcy5wcm9wcz1lLHRoaXMuY29udGV4dD1ufWZ1bmN0aW9uIHYoZSxuKXtpZihudWxsPT1uKXJldHVybiBlLl9fP3YoZS5fXyxlLl9fLl9fay5pbmRleE9mKGUpKzEpOm51bGw7Zm9yKHZhciBfO248ZS5fX2subGVuZ3RoO24rKylpZihudWxsIT0oXz1lLl9fa1tuXSkmJm51bGwhPV8uX19lKXJldHVybiBfLl9fZTtyZXR1cm4iZnVuY3Rpb24iPT10eXBlb2YgZS50eXBlP3YoZSk6bnVsbH1mdW5jdGlvbiB5KGUpe3ZhciBuLF87aWYobnVsbCE9KGU9ZS5fXykmJm51bGwhPWUuX19jKXtmb3IoZS5fX2U9ZS5fX2MuYmFzZT1udWxsLG49MDtuPGUuX19rLmxlbmd0aDtuKyspaWYobnVsbCE9KF89ZS5fX2tbbl0pJiZudWxsIT1fLl9fZSl7ZS5fX2U9ZS5fX2MuYmFzZT1fLl9fZTticmVha31yZXR1cm4geShlKX19ZnVuY3Rpb24gbShlKXsoIWUuX19kJiYoZS5fX2Q9ITApJiZ0LnB1c2goZSkmJiFnLl9fcisrfHxyIT09bi5kZWJvdW5jZVJlbmRlcmluZykmJigocj1uLmRlYm91bmNlUmVuZGVyaW5nKXx8bykoZyl9ZnVuY3Rpb24gZygpe2Zvcih2YXIgZTtnLl9fcj10Lmxlbmd0aDspZT10LnNvcnQoZnVuY3Rpb24oZSxuKXtyZXR1cm4gZS5fX3YuX19iLW4uX192Ll9fYn0pLHQ9W10sZS5zb21lKGZ1bmN0aW9uKGUpe3ZhciBuLF8sdCxvLHIsdTtlLl9fZCYmKHI9KG89KG49ZSkuX192KS5fX2UsKHU9bi5fX1ApJiYoXz1bXSwodD1zKHt9LG8pKS5fX3Y9by5fX3YrMSxQKHUsbyx0LG4uX19uLHZvaWQgMCE9PXUub3duZXJTVkdFbGVtZW50LG51bGwhPW8uX19oP1tyXTpudWxsLF8sbnVsbD09cj92KG8pOnIsby5fX2gpLEQoXyxvKSxvLl9fZSE9ciYmeShvKSkpfSl9ZnVuY3Rpb24gayhlLG4sXyx0LG8scix1LGMscyxmKXt2YXIgYSxkLHksbSxnLGsseCxIPXQmJnQuX19rfHxpLEU9SC5sZW5ndGg7Zm9yKF8uX19rPVtdLGE9MDthPG4ubGVuZ3RoO2ErKylpZihudWxsIT0obT1fLl9fa1thXT1udWxsPT0obT1uW2FdKXx8ImJvb2xlYW4iPT10eXBlb2YgbT9udWxsOiJzdHJpbmciPT10eXBlb2YgbXx8Im51bWJlciI9PXR5cGVvZiBtfHwiYmlnaW50Ij09dHlwZW9mIG0/cChudWxsLG0sbnVsbCxudWxsLG0pOkFycmF5LmlzQXJyYXkobSk/cChoLHtjaGlsZHJlbjptfSxudWxsLG51bGwsbnVsbCk6bS5fX2I+MD9wKG0udHlwZSxtLnByb3BzLG0ua2V5LG51bGwsbS5fX3YpOm0pKXtpZihtLl9fPV8sbS5fX2I9Xy5fX2IrMSxudWxsPT09KHk9SFthXSl8fHkmJm0ua2V5PT15LmtleSYmbS50eXBlPT09eS50eXBlKUhbYV09dm9pZCAwO2Vsc2UgZm9yKGQ9MDtkPEU7ZCsrKXtpZigoeT1IW2RdKSYmbS5rZXk9PXkua2V5JiZtLnR5cGU9PT15LnR5cGUpe0hbZF09dm9pZCAwO2JyZWFrfXk9bnVsbH1QKGUsbSx5PXl8fGwsbyxyLHUsYyxzLGYpLGc9bS5fX2UsKGQ9bS5yZWYpJiZ5LnJlZiE9ZCYmKHh8fCh4PVtdKSx5LnJlZiYmeC5wdXNoKHkucmVmLG51bGwsbSkseC5wdXNoKGQsbS5fX2N8fGcsbSkpLG51bGwhPWc/KG51bGw9PWsmJihrPWcpLCJmdW5jdGlvbiI9PXR5cGVvZiBtLnR5cGUmJm51bGwhPW0uX19rJiZtLl9faz09PXkuX19rP20uX19kPXM9YihtLHMsZSk6cz1DKGUsbSx5LEgsZyxzKSxmfHwib3B0aW9uIiE9PV8udHlwZT8iZnVuY3Rpb24iPT10eXBlb2YgXy50eXBlJiYoXy5fX2Q9cyk6ZS52YWx1ZT0iIik6cyYmeS5fX2U9PXMmJnMucGFyZW50Tm9kZSE9ZSYmKHM9dih5KSl9Zm9yKF8uX19lPWssYT1FO2EtLTspbnVsbCE9SFthXSYmKCJmdW5jdGlvbiI9PXR5cGVvZiBfLnR5cGUmJm51bGwhPUhbYV0uX19lJiZIW2FdLl9fZT09Xy5fX2QmJihfLl9fZD12KHQsYSsxKSksVShIW2FdLEhbYV0pKTtpZih4KWZvcihhPTA7YTx4Lmxlbmd0aDthKyspVCh4W2FdLHhbKythXSx4WysrYV0pfWZ1bmN0aW9uIGIoZSxuLF8pe3ZhciB0LG87Zm9yKHQ9MDt0PGUuX19rLmxlbmd0aDt0KyspKG89ZS5fX2tbdF0pJiYoby5fXz1lLG49ImZ1bmN0aW9uIj09dHlwZW9mIG8udHlwZT9iKG8sbixfKTpDKF8sbyxvLGUuX19rLG8uX19lLG4pKTtyZXR1cm4gbn1mdW5jdGlvbiBDKGUsbixfLHQsbyxyKXt2YXIgdSxsLGk7aWYodm9pZCAwIT09bi5fX2QpdT1uLl9fZCxuLl9fZD12b2lkIDA7ZWxzZSBpZihudWxsPT1ffHxvIT1yfHxudWxsPT1vLnBhcmVudE5vZGUpZTppZihudWxsPT1yfHxyLnBhcmVudE5vZGUhPT1lKWUuYXBwZW5kQ2hpbGQobyksdT1udWxsO2Vsc2V7Zm9yKGw9cixpPTA7KGw9bC5uZXh0U2libGluZykmJmk8dC5sZW5ndGg7aSs9MilpZihsPT1vKWJyZWFrIGU7ZS5pbnNlcnRCZWZvcmUobyxyKSx1PXJ9cmV0dXJuIHZvaWQgMCE9PXU/dTpvLm5leHRTaWJsaW5nfWZ1bmN0aW9uIHgoZSxuLF8peyItIj09PW5bMF0/ZS5zZXRQcm9wZXJ0eShuLF8pOmVbbl09bnVsbD09Xz8iIjoibnVtYmVyIiE9dHlwZW9mIF98fGMudGVzdChuKT9fOl8rInB4In1mdW5jdGlvbiBIKGUsbixfLHQsbyl7dmFyIHI7ZTppZigic3R5bGUiPT09bilpZigic3RyaW5nIj09dHlwZW9mIF8pZS5zdHlsZS5jc3NUZXh0PV87ZWxzZXtpZigic3RyaW5nIj09dHlwZW9mIHQmJihlLnN0eWxlLmNzc1RleHQ9dD0iIiksdClmb3IobiBpbiB0KV8mJm4gaW4gX3x8eChlLnN0eWxlLG4sIiIpO2lmKF8pZm9yKG4gaW4gXyl0JiZfW25dPT09dFtuXXx8eChlLnN0eWxlLG4sX1tuXSl9ZWxzZSBpZigibyI9PT1uWzBdJiYibiI9PT1uWzFdKXI9biE9PShuPW4ucmVwbGFjZSgvQ2FwdHVyZSQvLCIiKSksbj1uLnRvTG93ZXJDYXNlKClpbiBlP24udG9Mb3dlckNhc2UoKS5zbGljZSgyKTpuLnNsaWNlKDIpLGUubHx8KGUubD17fSksZS5sW24rcl09XyxfP3R8fGUuYWRkRXZlbnRMaXN0ZW5lcihuLHI/UzpFLHIpOmUucmVtb3ZlRXZlbnRMaXN0ZW5lcihuLHI/UzpFLHIpO2Vsc2UgaWYoImRhbmdlcm91c2x5U2V0SW5uZXJIVE1MIiE9PW4pe2lmKG8pbj1uLnJlcGxhY2UoL3hsaW5rW0g6aF0vLCJoIikucmVwbGFjZSgvc05hbWUkLywicyIpO2Vsc2UgaWYoImhyZWYiIT09biYmImxpc3QiIT09biYmImZvcm0iIT09biYmInRhYkluZGV4IiE9PW4mJiJkb3dubG9hZCIhPT1uJiZuIGluIGUpdHJ5e2Vbbl09bnVsbD09Xz8iIjpfO2JyZWFrIGV9Y2F0Y2goZSl7fSJmdW5jdGlvbiI9PXR5cGVvZiBffHwobnVsbCE9XyYmKCExIT09X3x8ImEiPT09blswXSYmInIiPT09blsxXSk/ZS5zZXRBdHRyaWJ1dGUobixfKTplLnJlbW92ZUF0dHJpYnV0ZShuKSl9fWZ1bmN0aW9uIEUoZSl7dGhpcy5sW2UudHlwZSshMV0obi5ldmVudD9uLmV2ZW50KGUpOmUpfWZ1bmN0aW9uIFMoZSl7dGhpcy5sW2UudHlwZSshMF0obi5ldmVudD9uLmV2ZW50KGUpOmUpfWZ1bmN0aW9uIFAoZSxfLHQsbyxyLHUsbCxpLGMpe3ZhciBmLGEscCx2LHksbSxnLGIsQyx4LEgsRT1fLnR5cGU7aWYodm9pZCAwIT09Xy5jb25zdHJ1Y3RvcilyZXR1cm4gbnVsbDtudWxsIT10Ll9faCYmKGM9dC5fX2gsaT1fLl9fZT10Ll9fZSxfLl9faD1udWxsLHU9W2ldKSwoZj1uLl9fYikmJmYoXyk7dHJ5e2U6aWYoImZ1bmN0aW9uIj09dHlwZW9mIEUpe2lmKGI9Xy5wcm9wcyxDPShmPUUuY29udGV4dFR5cGUpJiZvW2YuX19jXSx4PWY/Qz9DLnByb3BzLnZhbHVlOmYuX186byx0Ll9fYz9nPShhPV8uX19jPXQuX19jKS5fXz1hLl9fRTooInByb3RvdHlwZSJpbiBFJiZFLnByb3RvdHlwZS5yZW5kZXI/Xy5fX2M9YT1uZXcgRShiLHgpOihfLl9fYz1hPW5ldyBkKGIseCksYS5jb25zdHJ1Y3Rvcj1FLGEucmVuZGVyPUEpLEMmJkMuc3ViKGEpLGEucHJvcHM9YixhLnN0YXRlfHwoYS5zdGF0ZT17fSksYS5jb250ZXh0PXgsYS5fX249byxwPWEuX19kPSEwLGEuX19oPVtdKSxudWxsPT1hLl9fcyYmKGEuX19zPWEuc3RhdGUpLG51bGwhPUUuZ2V0RGVyaXZlZFN0YXRlRnJvbVByb3BzJiYoYS5fX3M9PWEuc3RhdGUmJihhLl9fcz1zKHt9LGEuX19zKSkscyhhLl9fcyxFLmdldERlcml2ZWRTdGF0ZUZyb21Qcm9wcyhiLGEuX19zKSkpLHY9YS5wcm9wcyx5PWEuc3RhdGUscCludWxsPT1FLmdldERlcml2ZWRTdGF0ZUZyb21Qcm9wcyYmbnVsbCE9YS5jb21wb25lbnRXaWxsTW91bnQmJmEuY29tcG9uZW50V2lsbE1vdW50KCksbnVsbCE9YS5jb21wb25lbnREaWRNb3VudCYmYS5fX2gucHVzaChhLmNvbXBvbmVudERpZE1vdW50KTtlbHNle2lmKG51bGw9PUUuZ2V0RGVyaXZlZFN0YXRlRnJvbVByb3BzJiZiIT09diYmbnVsbCE9YS5jb21wb25lbnRXaWxsUmVjZWl2ZVByb3BzJiZhLmNvbXBvbmVudFdpbGxSZWNlaXZlUHJvcHMoYix4KSwhYS5fX2UmJm51bGwhPWEuc2hvdWxkQ29tcG9uZW50VXBkYXRlJiYhMT09PWEuc2hvdWxkQ29tcG9uZW50VXBkYXRlKGIsYS5fX3MseCl8fF8uX192PT09dC5fX3Ype2EucHJvcHM9YixhLnN0YXRlPWEuX19zLF8uX192IT09dC5fX3YmJihhLl9fZD0hMSksYS5fX3Y9XyxfLl9fZT10Ll9fZSxfLl9faz10Ll9fayxfLl9fay5mb3JFYWNoKGZ1bmN0aW9uKGUpe2UmJihlLl9fPV8pfSksYS5fX2gubGVuZ3RoJiZsLnB1c2goYSk7YnJlYWsgZX1udWxsIT1hLmNvbXBvbmVudFdpbGxVcGRhdGUmJmEuY29tcG9uZW50V2lsbFVwZGF0ZShiLGEuX19zLHgpLG51bGwhPWEuY29tcG9uZW50RGlkVXBkYXRlJiZhLl9faC5wdXNoKGZ1bmN0aW9uKCl7YS5jb21wb25lbnREaWRVcGRhdGUodix5LG0pfSl9YS5jb250ZXh0PXgsYS5wcm9wcz1iLGEuc3RhdGU9YS5fX3MsKGY9bi5fX3IpJiZmKF8pLGEuX19kPSExLGEuX192PV8sYS5fX1A9ZSxmPWEucmVuZGVyKGEucHJvcHMsYS5zdGF0ZSxhLmNvbnRleHQpLGEuc3RhdGU9YS5fX3MsbnVsbCE9YS5nZXRDaGlsZENvbnRleHQmJihvPXMocyh7fSxvKSxhLmdldENoaWxkQ29udGV4dCgpKSkscHx8bnVsbD09YS5nZXRTbmFwc2hvdEJlZm9yZVVwZGF0ZXx8KG09YS5nZXRTbmFwc2hvdEJlZm9yZVVwZGF0ZSh2LHkpKSxIPW51bGwhPWYmJmYudHlwZT09PWgmJm51bGw9PWYua2V5P2YucHJvcHMuY2hpbGRyZW46ZixrKGUsQXJyYXkuaXNBcnJheShIKT9IOltIXSxfLHQsbyxyLHUsbCxpLGMpLGEuYmFzZT1fLl9fZSxfLl9faD1udWxsLGEuX19oLmxlbmd0aCYmbC5wdXNoKGEpLGcmJihhLl9fRT1hLl9fPW51bGwpLGEuX19lPSExfWVsc2UgbnVsbD09dSYmXy5fX3Y9PT10Ll9fdj8oXy5fX2s9dC5fX2ssXy5fX2U9dC5fX2UpOl8uX19lPXcodC5fX2UsXyx0LG8scix1LGwsYyk7KGY9bi5kaWZmZWQpJiZmKF8pfWNhdGNoKGUpe18uX192PW51bGwsKGN8fG51bGwhPXUpJiYoXy5fX2U9aSxfLl9faD0hIWMsdVt1LmluZGV4T2YoaSldPW51bGwpLG4uX19lKGUsXyx0KX19ZnVuY3Rpb24gRChlLF8pe24uX19jJiZuLl9fYyhfLGUpLGUuc29tZShmdW5jdGlvbihfKXt0cnl7ZT1fLl9faCxfLl9faD1bXSxlLnNvbWUoZnVuY3Rpb24oZSl7ZS5jYWxsKF8pfSl9Y2F0Y2goZSl7bi5fX2UoZSxfLl9fdil9fSl9ZnVuY3Rpb24gdyhuLF8sdCxvLHIsdSxpLGMpe3ZhciBzLGEscCxoPXQucHJvcHMsZD1fLnByb3BzLHk9Xy50eXBlLG09MDtpZigic3ZnIj09PXkmJihyPSEwKSxudWxsIT11KWZvcig7bTx1Lmxlbmd0aDttKyspaWYoKHM9dVttXSkmJihzPT09bnx8KHk/cy5sb2NhbE5hbWU9PXk6Mz09cy5ub2RlVHlwZSkpKXtuPXMsdVttXT1udWxsO2JyZWFrfWlmKG51bGw9PW4pe2lmKG51bGw9PT15KXJldHVybiBkb2N1bWVudC5jcmVhdGVUZXh0Tm9kZShkKTtuPXI/ZG9jdW1lbnQuY3JlYXRlRWxlbWVudE5TKCJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIseSk6ZG9jdW1lbnQuY3JlYXRlRWxlbWVudCh5LGQuaXMmJmQpLHU9bnVsbCxjPSExfWlmKG51bGw9PT15KWg9PT1kfHxjJiZuLmRhdGE9PT1kfHwobi5kYXRhPWQpO2Vsc2V7aWYodT11JiZlLmNhbGwobi5jaGlsZE5vZGVzKSxhPShoPXQucHJvcHN8fGwpLmRhbmdlcm91c2x5U2V0SW5uZXJIVE1MLHA9ZC5kYW5nZXJvdXNseVNldElubmVySFRNTCwhYyl7aWYobnVsbCE9dSlmb3IoaD17fSxtPTA7bTxuLmF0dHJpYnV0ZXMubGVuZ3RoO20rKyloW24uYXR0cmlidXRlc1ttXS5uYW1lXT1uLmF0dHJpYnV0ZXNbbV0udmFsdWU7KHB8fGEpJiYocCYmKGEmJnAuX19odG1sPT1hLl9faHRtbHx8cC5fX2h0bWw9PT1uLmlubmVySFRNTCl8fChuLmlubmVySFRNTD1wJiZwLl9faHRtbHx8IiIpKX1pZihmdW5jdGlvbihlLG4sXyx0LG8pe3ZhciByO2ZvcihyIGluIF8pImNoaWxkcmVuIj09PXJ8fCJrZXkiPT09cnx8ciBpbiBufHxIKGUscixudWxsLF9bcl0sdCk7Zm9yKHIgaW4gbilvJiYiZnVuY3Rpb24iIT10eXBlb2YgbltyXXx8ImNoaWxkcmVuIj09PXJ8fCJrZXkiPT09cnx8InZhbHVlIj09PXJ8fCJjaGVja2VkIj09PXJ8fF9bcl09PT1uW3JdfHxIKGUscixuW3JdLF9bcl0sdCl9KG4sZCxoLHIsYykscClfLl9faz1bXTtlbHNlIGlmKG09Xy5wcm9wcy5jaGlsZHJlbixrKG4sQXJyYXkuaXNBcnJheShtKT9tOlttXSxfLHQsbyxyJiYiZm9yZWlnbk9iamVjdCIhPT15LHUsaSx1P3VbMF06dC5fX2smJnYodCwwKSxjKSxudWxsIT11KWZvcihtPXUubGVuZ3RoO20tLTspbnVsbCE9dVttXSYmZih1W21dKTtjfHwoInZhbHVlImluIGQmJnZvaWQgMCE9PShtPWQudmFsdWUpJiYobSE9PW4udmFsdWV8fCJwcm9ncmVzcyI9PT15JiYhbSkmJkgobiwidmFsdWUiLG0saC52YWx1ZSwhMSksImNoZWNrZWQiaW4gZCYmdm9pZCAwIT09KG09ZC5jaGVja2VkKSYmbSE9PW4uY2hlY2tlZCYmSChuLCJjaGVja2VkIixtLGguY2hlY2tlZCwhMSkpfXJldHVybiBufWZ1bmN0aW9uIFQoZSxfLHQpe3RyeXsiZnVuY3Rpb24iPT10eXBlb2YgZT9lKF8pOmUuY3VycmVudD1ffWNhdGNoKGUpe24uX19lKGUsdCl9fWZ1bmN0aW9uIFUoZSxfLHQpe3ZhciBvLHI7aWYobi51bm1vdW50JiZuLnVubW91bnQoZSksKG89ZS5yZWYpJiYoby5jdXJyZW50JiZvLmN1cnJlbnQhPT1lLl9fZXx8VChvLG51bGwsXykpLG51bGwhPShvPWUuX19jKSl7aWYoby5jb21wb25lbnRXaWxsVW5tb3VudCl0cnl7by5jb21wb25lbnRXaWxsVW5tb3VudCgpfWNhdGNoKGUpe24uX19lKGUsXyl9by5iYXNlPW8uX19QPW51bGx9aWYobz1lLl9faylmb3Iocj0wO3I8by5sZW5ndGg7cisrKW9bcl0mJlUob1tyXSxfLCJmdW5jdGlvbiIhPXR5cGVvZiBlLnR5cGUpO3R8fG51bGw9PWUuX19lfHxmKGUuX19lKSxlLl9fZT1lLl9fZD12b2lkIDB9ZnVuY3Rpb24gQShlLG4sXyl7cmV0dXJuIHRoaXMuY29uc3RydWN0b3IoZSxfKX1mdW5jdGlvbiBNKF8sdCxvKXt2YXIgcix1LGk7bi5fXyYmbi5fXyhfLHQpLHU9KHI9ImZ1bmN0aW9uIj09dHlwZW9mIG8pP251bGw6byYmby5fX2t8fHQuX19rLGk9W10sUCh0LF89KCFyJiZvfHx0KS5fX2s9YShoLG51bGwsW19dKSx1fHxsLGwsdm9pZCAwIT09dC5vd25lclNWR0VsZW1lbnQsIXImJm8/W29dOnU/bnVsbDp0LmZpcnN0Q2hpbGQ/ZS5jYWxsKHQuY2hpbGROb2Rlcyk6bnVsbCxpLCFyJiZvP286dT91Ll9fZTp0LmZpcnN0Q2hpbGQsciksRChpLF8pfWZ1bmN0aW9uIEYoZSxuKXt2YXIgXz17X19jOm49Il9fY0MiK3UrKyxfXzplLENvbnN1bWVyOmZ1bmN0aW9uKGUsbil7cmV0dXJuIGUuY2hpbGRyZW4obil9LFByb3ZpZGVyOmZ1bmN0aW9uKGUpe3ZhciBfLHQ7cmV0dXJuIHRoaXMuZ2V0Q2hpbGRDb250ZXh0fHwoXz1bXSwodD17fSlbbl09dGhpcyx0aGlzLmdldENoaWxkQ29udGV4dD1mdW5jdGlvbigpe3JldHVybiB0fSx0aGlzLnNob3VsZENvbXBvbmVudFVwZGF0ZT1mdW5jdGlvbihlKXt0aGlzLnByb3BzLnZhbHVlIT09ZS52YWx1ZSYmXy5zb21lKG0pfSx0aGlzLnN1Yj1mdW5jdGlvbihlKXtfLnB1c2goZSk7dmFyIG49ZS5jb21wb25lbnRXaWxsVW5tb3VudDtlLmNvbXBvbmVudFdpbGxVbm1vdW50PWZ1bmN0aW9uKCl7Xy5zcGxpY2UoXy5pbmRleE9mKGUpLDEpLG4mJm4uY2FsbChlKX19KSxlLmNoaWxkcmVufX07cmV0dXJuIF8uUHJvdmlkZXIuX189Xy5Db25zdW1lci5jb250ZXh0VHlwZT1ffWU9aS5zbGljZSxuPXtfX2U6ZnVuY3Rpb24oZSxuKXtmb3IodmFyIF8sdCxvO249bi5fXzspaWYoKF89bi5fX2MpJiYhXy5fXyl0cnl7aWYoKHQ9Xy5jb25zdHJ1Y3RvcikmJm51bGwhPXQuZ2V0RGVyaXZlZFN0YXRlRnJvbUVycm9yJiYoXy5zZXRTdGF0ZSh0LmdldERlcml2ZWRTdGF0ZUZyb21FcnJvcihlKSksbz1fLl9fZCksbnVsbCE9Xy5jb21wb25lbnREaWRDYXRjaCYmKF8uY29tcG9uZW50RGlkQ2F0Y2goZSksbz1fLl9fZCksbylyZXR1cm4gXy5fX0U9X31jYXRjaChuKXtlPW59dGhyb3cgZX19LF89MCxkLnByb3RvdHlwZS5zZXRTdGF0ZT1mdW5jdGlvbihlLG4pe3ZhciBfO189bnVsbCE9dGhpcy5fX3MmJnRoaXMuX19zIT09dGhpcy5zdGF0ZT90aGlzLl9fczp0aGlzLl9fcz1zKHt9LHRoaXMuc3RhdGUpLCJmdW5jdGlvbiI9PXR5cGVvZiBlJiYoZT1lKHMoe30sXyksdGhpcy5wcm9wcykpLGUmJnMoXyxlKSxudWxsIT1lJiZ0aGlzLl9fdiYmKG4mJnRoaXMuX19oLnB1c2gobiksbSh0aGlzKSl9LGQucHJvdG90eXBlLmZvcmNlVXBkYXRlPWZ1bmN0aW9uKGUpe3RoaXMuX192JiYodGhpcy5fX2U9ITAsZSYmdGhpcy5fX2gucHVzaChlKSxtKHRoaXMpKX0sZC5wcm90b3R5cGUucmVuZGVyPWgsdD1bXSxvPSJmdW5jdGlvbiI9PXR5cGVvZiBQcm9taXNlP1Byb21pc2UucHJvdG90eXBlLnRoZW4uYmluZChQcm9taXNlLnJlc29sdmUoKSk6c2V0VGltZW91dCxnLl9fcj0wLHU9MDt2YXIgTCxOLFcsUj0wLEk9W10sTz1uLl9fYixWPW4uX19yLHE9bi5kaWZmZWQsQj1uLl9fYywkPW4udW5tb3VudDtmdW5jdGlvbiBqKGUsXyl7bi5fX2gmJm4uX19oKE4sZSxSfHxfKSxSPTA7dmFyIHQ9Ti5fX0h8fChOLl9fSD17X186W10sX19oOltdfSk7cmV0dXJuIGU+PXQuX18ubGVuZ3RoJiZ0Ll9fLnB1c2goe30pLHQuX19bZV19ZnVuY3Rpb24gRyhlKXtyZXR1cm4gUj0xLHooaWUsZSl9ZnVuY3Rpb24geihlLG4sXyl7dmFyIHQ9aihMKyssMik7cmV0dXJuIHQudD1lLHQuX19jfHwodC5fXz1bXz9fKG4pOmllKHZvaWQgMCxuKSxmdW5jdGlvbihlKXt2YXIgbj10LnQodC5fX1swXSxlKTt0Ll9fWzBdIT09biYmKHQuX189W24sdC5fX1sxXV0sdC5fX2Muc2V0U3RhdGUoe30pKX1dLHQuX19jPU4pLHQuX199ZnVuY3Rpb24gSihlLF8pe3ZhciB0PWooTCsrLDMpOyFuLl9fcyYmbGUodC5fX0gsXykmJih0Ll9fPWUsdC5fX0g9XyxOLl9fSC5fX2gucHVzaCh0KSl9ZnVuY3Rpb24gSyhlLF8pe3ZhciB0PWooTCsrLDQpOyFuLl9fcyYmbGUodC5fX0gsXykmJih0Ll9fPWUsdC5fX0g9XyxOLl9faC5wdXNoKHQpKX1mdW5jdGlvbiBRKGUpe3JldHVybiBSPTUsWShmdW5jdGlvbigpe3JldHVybntjdXJyZW50OmV9fSxbXSl9ZnVuY3Rpb24gWChlLG4sXyl7Uj02LEsoZnVuY3Rpb24oKXsiZnVuY3Rpb24iPT10eXBlb2YgZT9lKG4oKSk6ZSYmKGUuY3VycmVudD1uKCkpfSxudWxsPT1fP186Xy5jb25jYXQoZSkpfWZ1bmN0aW9uIFkoZSxuKXt2YXIgXz1qKEwrKyw3KTtyZXR1cm4gbGUoXy5fX0gsbikmJihfLl9fPWUoKSxfLl9fSD1uLF8uX19oPWUpLF8uX199ZnVuY3Rpb24gWihlLG4pe3JldHVybiBSPTgsWShmdW5jdGlvbigpe3JldHVybiBlfSxuKX1mdW5jdGlvbiBlZShlKXt2YXIgbj1OLmNvbnRleHRbZS5fX2NdLF89aihMKyssOSk7cmV0dXJuIF8uYz1lLG4/KG51bGw9PV8uX18mJihfLl9fPSEwLG4uc3ViKE4pKSxuLnByb3BzLnZhbHVlKTplLl9ffWZ1bmN0aW9uIG5lKGUsXyl7bi51c2VEZWJ1Z1ZhbHVlJiZuLnVzZURlYnVnVmFsdWUoXz9fKGUpOmUpfWZ1bmN0aW9uIF9lKGUpe3ZhciBuPWooTCsrLDEwKSxfPUcoKTtyZXR1cm4gbi5fXz1lLE4uY29tcG9uZW50RGlkQ2F0Y2h8fChOLmNvbXBvbmVudERpZENhdGNoPWZ1bmN0aW9uKGUpe24uX18mJm4uX18oZSksX1sxXShlKX0pLFtfWzBdLGZ1bmN0aW9uKCl7X1sxXSh2b2lkIDApfV19ZnVuY3Rpb24gdGUoKXtJLmZvckVhY2goZnVuY3Rpb24oZSl7aWYoZS5fX1ApdHJ5e2UuX19ILl9faC5mb3JFYWNoKHJlKSxlLl9fSC5fX2guZm9yRWFjaCh1ZSksZS5fX0guX19oPVtdfWNhdGNoKF8pe2UuX19ILl9faD1bXSxuLl9fZShfLGUuX192KX19KSxJPVtdfW4uX19iPWZ1bmN0aW9uKGUpe049bnVsbCxPJiZPKGUpfSxuLl9fcj1mdW5jdGlvbihlKXtWJiZWKGUpLEw9MDt2YXIgbj0oTj1lLl9fYykuX19IO24mJihuLl9faC5mb3JFYWNoKHJlKSxuLl9faC5mb3JFYWNoKHVlKSxuLl9faD1bXSl9LG4uZGlmZmVkPWZ1bmN0aW9uKGUpe3EmJnEoZSk7dmFyIF89ZS5fX2M7XyYmXy5fX0gmJl8uX19ILl9faC5sZW5ndGgmJigxIT09SS5wdXNoKF8pJiZXPT09bi5yZXF1ZXN0QW5pbWF0aW9uRnJhbWV8fCgoVz1uLnJlcXVlc3RBbmltYXRpb25GcmFtZSl8fGZ1bmN0aW9uKGUpe3ZhciBuLF89ZnVuY3Rpb24oKXtjbGVhclRpbWVvdXQodCksb2UmJmNhbmNlbEFuaW1hdGlvbkZyYW1lKG4pLHNldFRpbWVvdXQoZSl9LHQ9c2V0VGltZW91dChfLDEwMCk7b2UmJihuPXJlcXVlc3RBbmltYXRpb25GcmFtZShfKSl9KSh0ZSkpLE49dm9pZCAwfSxuLl9fYz1mdW5jdGlvbihlLF8pe18uc29tZShmdW5jdGlvbihlKXt0cnl7ZS5fX2guZm9yRWFjaChyZSksZS5fX2g9ZS5fX2guZmlsdGVyKGZ1bmN0aW9uKGUpe3JldHVybiFlLl9ffHx1ZShlKX0pfWNhdGNoKHQpe18uc29tZShmdW5jdGlvbihlKXtlLl9faCYmKGUuX19oPVtdKX0pLF89W10sbi5fX2UodCxlLl9fdil9fSksQiYmQihlLF8pfSxuLnVubW91bnQ9ZnVuY3Rpb24oZSl7JCYmJChlKTt2YXIgXz1lLl9fYztpZihfJiZfLl9fSCl0cnl7Xy5fX0guX18uZm9yRWFjaChyZSl9Y2F0Y2goZSl7bi5fX2UoZSxfLl9fdil9fTt2YXIgb2U9ImZ1bmN0aW9uIj09dHlwZW9mIHJlcXVlc3RBbmltYXRpb25GcmFtZTtmdW5jdGlvbiByZShlKXt2YXIgbj1OOyJmdW5jdGlvbiI9PXR5cGVvZiBlLl9fYyYmZS5fX2MoKSxOPW59ZnVuY3Rpb24gdWUoZSl7dmFyIG49TjtlLl9fYz1lLl9fKCksTj1ufWZ1bmN0aW9uIGxlKGUsbil7cmV0dXJuIWV8fGUubGVuZ3RoIT09bi5sZW5ndGh8fG4uc29tZShmdW5jdGlvbihuLF8pe3JldHVybiBuIT09ZVtfXX0pfWZ1bmN0aW9uIGllKGUsbil7cmV0dXJuImZ1bmN0aW9uIj09dHlwZW9mIG4/bihlKTpufXZhciBjZT1mdW5jdGlvbihlLG4sXyx0KXt2YXIgbztuWzBdPTA7Zm9yKHZhciByPTE7cjxuLmxlbmd0aDtyKyspe3ZhciB1PW5bcisrXSxsPW5bcl0/KG5bMF18PXU/MToyLF9bbltyKytdXSk6blsrK3JdOzM9PT11P3RbMF09bDo0PT09dT90WzFdPU9iamVjdC5hc3NpZ24odFsxXXx8e30sbCk6NT09PXU/KHRbMV09dFsxXXx8e30pW25bKytyXV09bDo2PT09dT90WzFdW25bKytyXV0rPWwrIiI6dT8obz1lLmFwcGx5KGwsY2UoZSxsLF8sWyIiLG51bGxdKSksdC5wdXNoKG8pLGxbMF0/blswXXw9MjoobltyLTJdPTAsbltyXT1vKSk6dC5wdXNoKGwpfXJldHVybiB0fSxzZT1uZXcgTWFwLGZlPWZ1bmN0aW9uKGUpe3ZhciBuPXNlLmdldCh0aGlzKTtyZXR1cm4gbnx8KG49bmV3IE1hcCxzZS5zZXQodGhpcyxuKSksKG49Y2UodGhpcyxuLmdldChlKXx8KG4uc2V0KGUsbj1mdW5jdGlvbihlKXtmb3IodmFyIG4sXyx0PTEsbz0iIixyPSIiLHU9WzBdLGw9ZnVuY3Rpb24oZSl7MT09PXQmJihlfHwobz1vLnJlcGxhY2UoL15ccypcblxzKnxccypcblxzKiQvZywiIikpKT91LnB1c2goMCxlLG8pOjM9PT10JiYoZXx8byk/KHUucHVzaCgzLGUsbyksdD0yKToyPT09dCYmIi4uLiI9PT1vJiZlP3UucHVzaCg0LGUsMCk6Mj09PXQmJm8mJiFlP3UucHVzaCg1LDAsITAsbyk6dD49NSYmKChvfHwhZSYmNT09PXQpJiYodS5wdXNoKHQsMCxvLF8pLHQ9NiksZSYmKHUucHVzaCh0LGUsMCxfKSx0PTYpKSxvPSIifSxpPTA7aTxlLmxlbmd0aDtpKyspe2kmJigxPT09dCYmbCgpLGwoaSkpO2Zvcih2YXIgYz0wO2M8ZVtpXS5sZW5ndGg7YysrKW49ZVtpXVtjXSwxPT09dD8iPCI9PT1uPyhsKCksdT1bdV0sdD0zKTpvKz1uOjQ9PT10PyItLSI9PT1vJiYiPiI9PT1uPyh0PTEsbz0iIik6bz1uK29bMF06cj9uPT09cj9yPSIiOm8rPW46JyInPT09bnx8IiciPT09bj9yPW46Ij4iPT09bj8obCgpLHQ9MSk6dCYmKCI9Ij09PW4/KHQ9NSxfPW8sbz0iIik6Ii8iPT09biYmKHQ8NXx8Ij4iPT09ZVtpXVtjKzFdKT8obCgpLDM9PT10JiYodT11WzBdKSx0PXUsKHU9dVswXSkucHVzaCgyLDAsdCksdD0wKToiICI9PT1ufHwiXHQiPT09bnx8IlxuIj09PW58fCJcciI9PT1uPyhsKCksdD0yKTpvKz1uKSwzPT09dCYmIiEtLSI9PT1vJiYodD00LHU9dVswXSl9cmV0dXJuIGwoKSx1fShlKSksbiksYXJndW1lbnRzLFtdKSkubGVuZ3RoPjE/bjpuWzBdfS5iaW5kKGEpO2V4cG9ydHthIGFzIGgsZmUgYXMgaHRtbCxNIGFzIHJlbmRlcixkIGFzIENvbXBvbmVudCxGIGFzIGNyZWF0ZUNvbnRleHQsRyBhcyB1c2VTdGF0ZSx6IGFzIHVzZVJlZHVjZXIsSiBhcyB1c2VFZmZlY3QsSyBhcyB1c2VMYXlvdXRFZmZlY3QsUSBhcyB1c2VSZWYsWCBhcyB1c2VJbXBlcmF0aXZlSGFuZGxlLFkgYXMgdXNlTWVtbyxaIGFzIHVzZUNhbGxiYWNrLGVlIGFzIHVzZUNvbnRleHQsbmUgYXMgdXNlRGVidWdWYWx1ZSxfZSBhcyB1c2VFcnJvckJvdW5kYXJ5fTsK');
+
+const RAR = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+const RD = {
+  common:    { name: 'Обычный',     color: '#9AA0A8', base: 70,    p: 68 },
+  uncommon:  { name: 'Необычный',   color: '#5BC98A', base: 650,   p: 22 },
+  rare:      { name: 'Редкий',      color: '#4C8DFF', base: 2600,  p: 7 },
+  epic:      { name: 'Эпический',   color: '#A66BFF', base: 12000, p: 2.5 },
+  legendary: { name: 'Легендарный', color: '#F5B83D', base: 52000, p: 0.5 }
+};
+const COST = 1000, LOCK0 = 450, LOCKSTEP = 185, SPIN_END = 2250;
+const BOTS = ['kirill_77', 'Mara', 'dimon.sim', 'Ольга К.', 'zero_one', 'Влад', 'nomernoy', 'Тимур', 'lena.v', '777boss', 'Арсен', 'grisha'];
+const PLAYERS = [
+  { name: '777boss', value: 412300, count: 38, best: 'legendary' },
+  { name: 'Mara', value: 268900, count: 51, best: 'legendary' },
+  { name: 'kirill_77', value: 154200, count: 29, best: 'epic' },
+  { name: 'Ольга К.', value: 98400, count: 44, best: 'epic' },
+  { name: 'nomernoy', value: 61750, count: 22, best: 'epic' },
+  { name: 'Тимур', value: 35900, count: 31, best: 'rare' },
+  { name: 'zero_one', value: 18400, count: 17, best: 'rare' },
+  { name: 'lena.v', value: 9650, count: 12, best: 'rare' },
+  { name: 'dimon.sim', value: 4320, count: 9, best: 'uncommon' },
+  { name: 'grisha', value: 1890, count: 6, best: 'uncommon' }
+];
+// ?r=legendary в адресе — принудительная редкость для демо
+const FORCED = new URLSearchParams(location.search).get('r');
+
+let _uid = 1;
+const uid = () => 'id' + (++_uid);
+const ri = n => Math.floor(Math.random() * n);
+const fmt = n => Math.round(n).toLocaleString('ru-RU');
+const r10 = n => Math.max(10, Math.round(n / 10) * 10);
+const seq = f => Array.from({ length: 7 }, (_, i) => f(i));
+function pickRarity(w) {
+  const total = RAR.reduce((a, k) => a + w[k], 0);
+  let x = Math.random() * total, acc = 0;
+  for (const k of RAR) { acc += w[k]; if (x < acc) return k; }
+  return 'common';
+}
+function genDigits(r) {
+  const code = [9, ri(10), ri(10)]; let t, d, a, b, s;
+  if (r === 'legendary') { d = ri(10); t = seq(() => d); if (Math.random() < 0.4) { code[1] = d; code[2] = d; } }
+  else if (r === 'epic') {
+    const m = ri(3);
+    if (m === 0) { s = ri(4); t = seq(i => s + i); }
+    else if (m === 1) { s = 6 + ri(4); t = seq(i => s - i); }
+    else { d = ri(10); t = [ri(10), d, d, d, d, d, d]; }
+  } else if (r === 'rare') {
+    if (Math.random() < 0.5) { d = ri(10); t = [ri(10), ri(10), ri(10), d, d, d, d]; }
+    else { a = ri(10); b = (a + 1 + ri(9)) % 10; t = [ri(10), a, b, a, b, a, b]; }
+  } else if (r === 'uncommon') {
+    if (Math.random() < 0.5) { d = ri(10); t = [ri(10), ri(10), ri(10), ri(10), d, d, d]; }
+    else { a = ri(10); b = (a + 1 + ri(9)) % 10; t = [ri(10), ri(10), ri(10), a, b, b, a]; }
+  } else {
+    t = seq(() => ri(10));
+    if (t[4] === t[5] && t[5] === t[6]) t[6] = (t[6] + 1) % 10;
+    if (t[3] === t[6] && t[4] === t[5]) t[5] = (t[5] + 3) % 10;
+  }
+  return code.concat(t);
+}
+const valueOf = r => r10(RD[r].base * (0.85 + Math.random() * 0.45));
+const phone = d => '+7 ' + d.slice(0, 3).join('') + ' ' + d.slice(3, 6).join('') + '-' + d[6] + d[7] + '-' + d[8] + d[9];
+const shortNum = d => '' + d[6] + d[7] + '-' + d[8] + d[9];
+const stepFor = v => r10(v * 0.05);
+const randDigits = () => Array.from({ length: 10 }, () => ri(10));
+const mmss = e => Math.floor(e / 60) + ':' + String(e % 60).padStart(2, '0');
+const makeSim = r => ({ id: uid(), digits: genDigits(r), rarity: r, value: valueOf(r) });
+function makeLot(minT, maxT, ends) {
+  const r = pickRarity({ common: 26, uncommon: 30, rare: 24, epic: 14, legendary: 6 });
+  const sim = makeSim(r);
+  return { ...sim, bid: r10(sim.value * (0.55 + Math.random() * 0.3)), step: stepFor(sim.value),
+    ends: ends || (minT + ri(maxT - minT)), seller: BOTS[ri(BOTS.length)], leader: null, bids: ri(6) };
+}
+function makeParticles(r) {
+  const n = r === 'legendary' ? 30 : r === 'epic' ? 18 : 0, cls = ['fa', 'fb', 'fc'];
+  return Array.from({ length: n }, (_, i) => ({
+    a: Math.round(i * (360 / n) + ri(12)), cls: cls[ri(3)], delay: ri(140),
+    color: r === 'legendary' && i % 3 === 0 ? '#FFF1D2' : RD[r].color
+  }));
+}
+const simOf = l => ({ id: l.id, digits: l.digits, rarity: l.rarity, value: l.value });
+const calcFit = () => Math.min(1, (Math.min(window.innerWidth, 480) - 48) / 326);
+
+/* icons */
+const Coin = ({ s = 16, c = '#8A8F98' }) => html`<svg width=${s} height=${s} viewBox="0 0 16 16" fill="none" stroke=${c} stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><circle cx="8" cy="8" r="3"/></svg>`;
+const Sim = ({ w = 16, h = 18, sw = 2 }) => html`<svg width=${w} height=${h} viewBox="0 0 20 22" fill="none" stroke="currentColor" stroke-width=${sw} stroke-linejoin="round"><path d="M2 2h11l5 5v13H2z"/><rect x="6" y="10" width="8" height="6" rx="1"/></svg>`;
+const Clock = () => html`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>`;
+const Plus = () => html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ECEDEF" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`;
+const Minus = () => html`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ECEDEF" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg>`;
+
+class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      tab: 'spin', balance: 10000, fit: calcFit(),
+      spinning: false, locked: 0, roll: randDigits(), result: null, showFx: false, countVal: 0, particles: [], fxKey: 0,
+      coll: [makeSim('rare'), makeSim('uncommon'), makeSim('common')],
+      recent: [], collFilter: 'all',
+      lots: [14, 48, 96, 141, 63, 178].map(e => makeLot(0, 0, e)), myLots: [], aucSeg: 'all', aucFilter: 'all',
+      sheet: null, listPrice: 0, rateSeg: 'value', toast: null
+    };
+    this.tid = 0;
+  }
+  componentDidMount() {
+    this.tiv = setInterval(() => this.tick(), 1000);
+    this.onResize = () => this.setState({ fit: calcFit() });
+    window.addEventListener('resize', this.onResize);
+  }
+  componentWillUnmount() {
+    clearInterval(this.tiv); clearInterval(this.siv); clearInterval(this.civ); clearTimeout(this.tt);
+    window.removeEventListener('resize', this.onResize);
+  }
+  toast(text, color) {
+    this.setState({ toast: { id: ++this.tid, text, color } });
+    clearTimeout(this.tt);
+    this.tt = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+  tick() {
+    const s = this.state; let bal = s.balance, coll = s.coll, msg = null;
+    let lots = s.lots.map(l => ({ ...l, ends: l.ends - 1 }));
+    if (lots.length && Math.random() < 0.3) {
+      const l = lots[ri(lots.length)];
+      if (l.ends > 0) {
+        if (l.leader === 'me') { bal += l.bid; msg = { text: 'Ставку перебили · ' + shortNum(l.digits), color: '#FF9A5C' }; }
+        const bot = BOTS[ri(BOTS.length)];
+        l.bid += l.step; l.leader = bot === l.seller ? 'Mara' : bot; l.bids += 1;
+        if (l.ends < 6) l.ends += 6;
+      }
+    }
+    lots.forEach(l => {
+      if (l.ends <= 0 && l.leader === 'me') {
+        coll = [simOf(l)].concat(coll);
+        msg = { text: 'Номер ваш · ' + shortNum(l.digits), color: RD[l.rarity].color };
+      }
+    });
+    lots = lots.filter(l => l.ends > 0);
+    while (lots.length < 6) lots.push(makeLot(45, 200));
+
+    let my = s.myLots.map(l => ({ ...l, ends: l.ends - 1 }));
+    if (my.length && Math.random() < 0.4) {
+      const m = my[ri(my.length)];
+      if (m.ends > 0) { m.bid += m.bids > 0 ? m.step : 0; m.bids += 1; }
+    }
+    my.forEach(l => {
+      if (l.ends > 0) return;
+      if (l.bids > 0) { bal += l.bid; msg = { text: 'Продано · ' + fmt(l.bid), color: '#5BC98A' }; }
+      else { coll = [simOf(l)].concat(coll); msg = { text: 'Без ставок · номер вернулся', color: '#9AA0A8' }; }
+    });
+    my = my.filter(l => l.ends > 0);
+    this.setState({ lots, myLots: my, balance: bal, coll });
+    if (msg) this.toast(msg.text, msg.color);
+  }
+  spin() {
+    const s = this.state;
+    if (s.spinning || s.balance < COST) return;
+    const r = FORCED && RD[FORCED] ? FORCED : pickRarity({ common: RD.common.p, uncommon: RD.uncommon.p, rare: RD.rare.p, epic: RD.epic.p, legendary: RD.legendary.p });
+    this.pending = makeSim(r);
+    clearInterval(this.siv); clearInterval(this.civ);
+    if (navigator.vibrate) navigator.vibrate(8);
+    this.setState({ spinning: true, balance: s.balance - COST, locked: 0, roll: randDigits(), showFx: false, countVal: 0 });
+    const t0 = performance.now();
+    this.siv = setInterval(() => {
+      const t = performance.now() - t0; let locked = 0;
+      for (let i = 0; i < 10; i++) if (t >= LOCK0 + i * LOCKSTEP) locked = i + 1;
+      if (t >= SPIN_END) { clearInterval(this.siv); this.reveal(); }
+      else this.setState({ locked, roll: randDigits() });
+    }, 50);
+  }
+  reveal() {
+    const p = this.pending, s = this.state;
+    const vib = { uncommon: 15, rare: [20, 40, 20], epic: [30, 40, 30, 40, 30], legendary: [40, 30, 40, 30, 120] }[p.rarity];
+    if (vib && navigator.vibrate) navigator.vibrate(vib);
+    this.setState({
+      spinning: false, locked: 10, result: p, showFx: true, particles: makeParticles(p.rarity), fxKey: s.fxKey + 1,
+      coll: [p].concat(s.coll), recent: [p].concat(s.recent).slice(0, 4)
+    });
+    const t0 = performance.now(), dur = p.rarity === 'legendary' ? 1100 : 700;
+    this.civ = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      this.setState({ countVal: Math.round(p.value * e) });
+      if (k >= 1) clearInterval(this.civ);
+    }, 30);
+  }
+  bid(id) {
+    const s = this.state; let bal = s.balance;
+    const lots = s.lots.map(l => {
+      if (l.id !== id || l.leader === 'me') return l;
+      const need = l.bid + l.step;
+      if (bal < need) return l;
+      bal -= need;
+      return { ...l, bid: need, leader: 'me', bids: l.bids + 1, ends: l.ends < 6 ? l.ends + 6 : l.ends };
+    });
+    this.setState({ lots, balance: bal });
+  }
+  pull(id) {
+    const s = this.state, l = s.myLots.find(x => x.id === id);
+    if (!l || l.bids > 0) return;
+    this.setState({ myLots: s.myLots.filter(x => x.id !== id), coll: [simOf(l)].concat(s.coll) });
+  }
+  selItem() { return this.state.coll.find(x => x.id === this.state.sheet); }
+  sell() {
+    const it = this.selItem(); if (!it) return;
+    const gain = r10(it.value * 0.7);
+    this.setState({ balance: this.state.balance + gain, coll: this.state.coll.filter(x => x.id !== it.id), sheet: null });
+    this.toast('+' + fmt(gain), '#5BC98A');
+  }
+  listLot() {
+    const it = this.selItem(); if (!it) return;
+    const lot = { ...simOf(it), bid: this.state.listPrice, step: stepFor(it.value), ends: 25, bids: 0 };
+    this.setState({ coll: this.state.coll.filter(x => x.id !== it.id), myLots: [lot].concat(this.state.myLots), sheet: null });
+    this.toast('Выставлено · ' + shortNum(it.digits), RD[it.rarity].color);
+  }
+  bump(dir) {
+    const it = this.selItem(); if (!it) return;
+    const st = stepFor(it.value);
+    this.setState({ listPrice: Math.max(st, this.state.listPrice + dir * st) });
+  }
+  go(tab) { this.setState({ tab, sheet: null }); if (this.scr) this.scr.scrollTop = 0; }
+
+  chips(key, cur) {
+    return html`<div class="chips">
+      ${[{ k: 'all', label: 'Все' }, ...RAR.map(r => ({ k: r, label: RD[r].name }))].map(c => html`
+        <button class=${'chip-f' + (cur === c.k ? ' on' : '')} onClick=${() => this.setState({ [key]: c.k })}>
+          ${c.k !== 'all' && html`<span class=${'dot bg-' + c.k}></span>`}
+          <span>${c.label}</span>
+        </button>`)}
+    </div>`;
+  }
+
+  spinScreen() {
+    const s = this.state, res = s.result, fx = !!(s.showFx && res), rk = res ? res.rarity : 'common';
+    const digits = [];
+    for (let i = 0; i < 10; i++) {
+      let ch, cls;
+      if (s.spinning) { const lk = i < s.locked; ch = lk ? this.pending.digits[i] : s.roll[i]; cls = lk ? 'd-lock' : 'd-roll'; }
+      else if (res) { ch = res.digits[i]; cls = 'd-lock'; }
+      else { ch = i === 0 ? 9 : 0; cls = 'd-idle'; }
+      digits.push(html`<span class=${'dg ' + cls}><span class="dg-in">${ch}</span></span>`);
+      if (i === 2) digits.push(html`<span class="gp"></span>`);
+      if (i === 5 || i === 7) digits.push(html`<span class="sep">-</span>`);
+    }
+    const ringN = { common: 0, uncommon: 1, rare: 2, epic: 2, legendary: 3 }[rk];
+    const fit = s.fit;
+    return html`<div class="col">
+      <div class="stage">
+        <div style=${`position:relative;flex:none;width:${326 * fit}px;height:${206 * fit}px`}>
+          <div class="scaler" style=${`transform:scale(${fit})`}>
+            <div class=${'cw' + (s.spinning ? ' spin' : '') + (fx ? ' fx-' + rk : '')} key=${'cw' + s.fxKey}>
+              ${fx && [0, 180, 360].slice(0, ringN).map(d => html`<div class=${'ring ring-' + rk} style=${`animation-delay:${d}ms`}></div>`)}
+              <div class=${'co ' + (fx ? 'b-' + rk : s.spinning ? 'b-spin' : '')}>
+                <div class="ci">
+                  ${fx && (rk === 'epic' || rk === 'legendary') && html`<div class="sw"></div>`}
+                  <div class="chip"></div>
+                  <div class=${'num mono ' + (fx ? 'r-' + rk : '')}>
+                    <span class="pfx">+7</span>${digits}
+                  </div>
+                </div>
+              </div>
+              ${fx && html`<div class="pts">${s.particles.map(p => html`
+                <div class="pw" style=${`transform:rotate(${p.a}deg)`}>
+                  <div class=${'pt ' + p.cls} style=${`animation-delay:${p.delay}ms;background:${p.color}`}></div>
+                </div>`)}</div>`}
+            </div>
+          </div>
+        </div>
+        <div class="rinfo">
+          ${fx && html`
+            <div class=${'disp rl up c-' + rk}>${RD[rk].name}</div>
+            <div class="rv up2 tnum"><${Coin}/><span>${fmt(s.countVal)}</span></div>`}
+        </div>
+      </div>
+
+      <button class="spin-btn" onClick=${() => this.spin()} disabled=${s.spinning || s.balance < COST}>
+        <span class="disp" style="font-weight:600;font-size:15px">Крутить</span>
+        <span style="display:flex;align-items:center;gap:6px;font-size:15px;font-weight:600"><${Coin} c="#0E0F12"/><span>${fmt(COST)}</span></span>
+      </button>
+
+      <div class="grid5">
+        ${RAR.map(r => html`<div class="pill tnum"><span class=${'dot bg-' + r}></span><span>${String(RD[r].p).replace('.', ',')}%</span></div>`)}
+      </div>
+
+      ${s.recent.length > 0 && html`<div class="col" style="margin-top:20px;gap:8px">
+        <div class="lbl">Последние</div>
+        <div class="grid4">
+          ${s.recent.map(x => html`<div class="pill up" key=${x.id} style="height:36px"><span class=${'dot bg-' + x.rarity}></span><span class="mono" style="font-size:12.5px;font-weight:500;color:#ECEDEF">${shortNum(x.digits)}</span></div>`)}
+        </div>
+      </div>`}
+    </div>`;
+  }
+
+  collScreen() {
+    const s = this.state;
+    const items = s.coll.filter(x => s.collFilter === 'all' || x.rarity === s.collFilter);
+    const total = s.coll.reduce((a, x) => a + x.value, 0);
+    return html`<div class="col">
+      <div class="grid2">
+        <div class="card stat"><div class="lbl">Номеров</div><div class="disp stat-v">${s.coll.length}</div></div>
+        <div class="card stat"><div class="lbl">Стоимость</div><div class="disp stat-v">${fmt(total)}</div></div>
+      </div>
+      ${this.chips('collFilter', s.collFilter)}
+      <div class="list">
+        ${items.map(x => html`
+          <button class="row" key=${x.id} onClick=${() => this.setState({ sheet: x.id, listPrice: r10(x.value * 0.9) })}>
+            <span class=${'rb t-' + x.rarity}><${Sim}/></span>
+            <span class="grow">
+              <span class="mono ell" style="font-size:16px;font-weight:600">${phone(x.digits)}</span>
+              <span class=${'c-' + x.rarity} style="font-size:12px;font-weight:500">${RD[x.rarity].name}</span>
+            </span>
+            <span class="val tnum"><${Coin} s=${14}/><span>${fmt(x.value)}</span></span>
+          </button>`)}
+        ${items.length === 0 && html`<div class="empty">Пусто</div>`}
+      </div>
+    </div>`;
+  }
+
+  aucScreen() {
+    const s = this.state;
+    const lots = s.lots.filter(l => s.aucFilter === 'all' || l.rarity === s.aucFilter).slice().sort((a, b) => a.ends - b.ends);
+    return html`<div class="col">
+      <div class="seg">
+        <button class=${'sg' + (s.aucSeg === 'all' ? ' on' : '')} onClick=${() => this.setState({ aucSeg: 'all' })}>Лоты</button>
+        <button class=${'sg' + (s.aucSeg === 'mine' ? ' on' : '')} onClick=${() => this.setState({ aucSeg: 'mine' })}>Мои · ${s.myLots.length}</button>
+      </div>
+      ${s.aucSeg === 'all' ? html`
+        ${this.chips('aucFilter', s.aucFilter)}
+        <div class="list" style="gap:10px">
+          ${lots.map(l => {
+            const mine = l.leader === 'me';
+            return html`<div class="lot" key=${l.id}>
+              <div class="lr wrap">
+                <span class="mono ln">${phone(l.digits)}</span>
+                <span class=${'tag t-' + l.rarity}>${RD[l.rarity].name}</span>
+              </div>
+              <div class="lr meta">
+                <span style="display:flex;align-items:center;gap:8px;min-width:0">
+                  <span class="av-s">${l.seller.charAt(0).toUpperCase()}</span>
+                  <span class="ell">${l.seller}</span>
+                </span>
+                <span class=${'mono timer' + (l.ends <= 10 ? ' urg' : '')}><${Clock}/><span>${mmss(Math.max(0, l.ends))}</span></span>
+              </div>
+              <div class="lr end">
+                <div class="col" style="gap:3px;min-width:0">
+                  <span style="font-size:11px;color:#7D828B">Ставка · ${l.bids}</span>
+                  <span class="bidv tnum"><${Coin} s=${15}/><span>${fmt(l.bid)}</span></span>
+                </div>
+                ${mine
+                  ? html`<button class="bb ghost" disabled>Вы лидер</button>`
+                  : html`<button class="bb" onClick=${() => this.bid(l.id)} disabled=${s.balance < l.bid + l.step}>+ ${fmt(l.step)}</button>`}
+              </div>
+            </div>`;
+          })}
+          ${lots.length === 0 && html`<div class="empty">Нет лотов</div>`}
+        </div>` : html`
+        <div class="list" style="gap:10px">
+          ${s.myLots.map(l => html`<div class="lot" key=${l.id}>
+            <div class="lr">
+              <span class="mono ln ell" style="min-width:0">${phone(l.digits)}</span>
+              <span class=${'mono timer meta' + (l.ends <= 10 ? ' urg' : '')}><${Clock}/><span>${mmss(Math.max(0, l.ends))}</span></span>
+            </div>
+            <div class="lr end">
+              <div class="col" style="gap:3px;min-width:0">
+                <span style="font-size:11px;color:#7D828B">Ставка · ${l.bids}</span>
+                <span class="bidv tnum"><${Coin} s=${15}/><span>${fmt(l.bid)}</span></span>
+              </div>
+              ${l.bids === 0
+                ? html`<button class="bb ghost" onClick=${() => this.pull(l.id)}>Снять</button>`
+                : html`<span class=${'tag t-' + l.rarity}>${RD[l.rarity].name}</span>`}
+            </div>
+          </div>`)}
+          ${s.myLots.length === 0 && html`<div class="empty">Пусто</div>`}
+        </div>`}
+    </div>`;
+  }
+
+  rateScreen() {
+    const s = this.state, byVal = s.rateSeg === 'value';
+    const total = s.coll.reduce((a, x) => a + x.value, 0);
+    let best = 'common';
+    s.coll.forEach(x => { if (RAR.indexOf(x.rarity) > RAR.indexOf(best)) best = x.rarity; });
+    const me = { name: 'Вы', value: total, count: s.coll.length, best, me: true };
+    const board = [...PLAYERS, me].sort((a, b) => byVal ? b.value - a.value : b.count - a.count);
+    const myRank = board.indexOf(me) + 1;
+    return html`<div class="col">
+      <div class="card hero">
+        <div class="col" style="gap:4px">
+          <span class="lbl">Место</span>
+          <span class="disp" style="font-size:30px;font-weight:600;line-height:1.1">#${myRank}</span>
+        </div>
+        <div class="col" style="gap:4px;align-items:flex-end;min-width:0">
+          <span class="lbl">${byVal ? 'Стоимость' : 'Номеров'}</span>
+          <span class="tnum" style="font-size:18px;font-weight:600;white-space:nowrap">${byVal ? fmt(total) : s.coll.length}</span>
+        </div>
+      </div>
+      <div class="seg" style="margin-top:12px">
+        <button class=${'sg' + (byVal ? ' on' : '')} onClick=${() => this.setState({ rateSeg: 'value' })}>Стоимость</button>
+        <button class=${'sg' + (!byVal ? ' on' : '')} onClick=${() => this.setState({ rateSeg: 'count' })}>Номера</button>
+      </div>
+      <div class="col" style="margin-top:10px;gap:4px">
+        ${board.map((p, i) => html`<div class=${'rk' + (p.me ? ' me' : '')} key=${p.name}>
+          <span class=${'disp rk-n' + (i < 3 ? ' top' : '')}>${i + 1}</span>
+          <span class="av">${p.name.charAt(0).toUpperCase()}</span>
+          <span style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">
+            <span class="ell" style="font-size:15px;font-weight:600">${p.name}</span>
+            <span class=${'dot bg-' + p.best}></span>
+          </span>
+          <span class="tnum" style="font-size:14px;font-weight:600;white-space:nowrap;flex:none">${byVal ? fmt(p.value) : p.count + ' шт'}</span>
+        </div>`)}
+      </div>
+    </div>`;
+  }
+
+  sheet() {
+    const it = this.selItem();
+    if (!it) return null;
+    return html`
+      <button class="ov" aria-label="Закрыть" onClick=${() => this.setState({ sheet: null })}></button>
+      <div class="sh">
+        <div class="grab"></div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div class="col" style="gap:8px;min-width:0">
+            <span class="mono ell" style="font-size:22px;font-weight:600">${phone(it.digits)}</span>
+            <span style="display:flex;align-items:center;gap:10px">
+              <span class=${'tag t-' + it.rarity}>${RD[it.rarity].name}</span>
+              <span class="val tnum"><${Coin} s=${14}/><span>${fmt(it.value)}</span></span>
+            </span>
+          </div>
+          <button class="ib" aria-label="Закрыть" onClick=${() => this.setState({ sheet: null })} style="width:44px;height:44px;margin:-6px -10px 0 0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ECEDEF" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+        <div style="height:1px;background:#23262D"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <span style="font-size:14px;color:#8A8F98">Старт аукциона</span>
+          <div class="stepper">
+            <button class="ib" aria-label="Меньше" style="width:44px;height:44px;border-radius:12px" onClick=${() => this.bump(-1)}><${Minus}/></button>
+            <span class="tnum" style="min-width:84px;text-align:center;font-size:16px;font-weight:600;white-space:nowrap">${fmt(this.state.listPrice)}</span>
+            <button class="ib" aria-label="Больше" style="width:44px;height:44px;border-radius:12px" onClick=${() => this.bump(1)}><${Plus}/></button>
+          </div>
+        </div>
+        <div class="col" style="gap:10px">
+          <button class="btn1" onClick=${() => this.listLot()}>На аукцион</button>
+          <button class="btn2" onClick=${() => this.sell()}>
+            <span>Продать сразу</span>
+            <span class="val tnum" style="font-size:15px"><${Coin} s=${14}/><span>${fmt(r10(it.value * 0.7))}</span></span>
+          </button>
+        </div>
+      </div>`;
+  }
+
+  render(_, s) {
+    const tabs = [
+      { id: 'spin', label: 'Крутить', icon: html`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M9 5v14M15 5v14"/></svg>` },
+      { id: 'coll', label: 'Коллекция', icon: html`<${Sim} w=${22} h=${22} sw=${1.7}/>` },
+      { id: 'auc', label: 'Аукцион', icon: html`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(-45 12 10)"><rect x="7" y="3" width="10" height="6" rx="1.5"/><path d="M12 9v11"/></g><path d="M13 21h8"/></svg>` },
+      { id: 'rate', label: 'Рейтинг', icon: html`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 20v-8M12 20V5M19 20v-5"/></svg>` }
+    ];
+    return html`<div class="app">
+      <div class="hdr">
+        <div class="disp logo">
+          <svg width="20" height="22" viewBox="0 0 20 22" fill="none" stroke="#ECEDEF" stroke-width="1.8" stroke-linejoin="round"><path d="M2 2h11l5 5v13H2z"/><rect x="6" y="10" width="8" height="6" rx="1"/></svg>
+          <span>SIMRUSH</span>
+        </div>
+        <div class="bal">
+          <${Coin}/>
+          <span class="bal-v tnum">${fmt(s.balance)}</span>
+          <button class="ib" aria-label="Пополнить" onClick=${() => { this.setState({ balance: this.state.balance + 5000 }); this.toast('+5 000', '#5BC98A'); }}><${Plus}/></button>
+        </div>
+      </div>
+
+      ${s.toast && html`<div class="toast" key=${'t' + s.toast.id}>
+        <span class="dot" style=${`width:8px;height:8px;background:${s.toast.color}`}></span>
+        <span class="ell" style="min-width:0">${s.toast.text}</span>
+      </div>`}
+
+      <div class="scr" ref=${el => (this.scr = el)}>
+        ${s.tab === 'spin' && this.spinScreen()}
+        ${s.tab === 'coll' && this.collScreen()}
+        ${s.tab === 'auc' && this.aucScreen()}
+        ${s.tab === 'rate' && this.rateScreen()}
+      </div>
+
+      <nav class="nav">
+        ${tabs.map(t => html`<button class=${'nb' + (s.tab === t.id ? ' on' : '')} onClick=${() => this.go(t.id)}>${t.icon}<span>${t.label}</span></button>`)}
+      </nav>
+
+      ${this.sheet()}
+    </div>`;
+  }
+}
+
+render(html`<${App}/>`, document.getElementById('root'));
+</script>
+</body>
+</html>
