@@ -1,0 +1,27 @@
+{
+  "name": "simrush",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n server,web -c blue,magenta \"npm:dev:server\" \"npm:dev:web\"",
+    "dev:server": "npm run dev -w @simrush/server",
+    "dev:web": "npm run dev -w @simrush/web",
+    "build": "npm run build -w @simrush/web && npm run build -w @simrush/server",
+    "start": "npm run start -w @simrush/server",
+    "test": "vitest run",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.1",
+    "concurrently": "^10.0.5",
+    "typescript": "~5.9.3",
+    "vitest": "^5.0.3"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

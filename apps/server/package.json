@@ -1,0 +1,21 @@
+{
+  "name": "@simrush/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/index.ts",
+    "build": "tsup",
+    "start": "node --disable-warning=ExperimentalWarning dist/index.js",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fastify/static": "^10.1.5",
+    "fastify": "^5.12.5"
+  },
+  "devDependencies": {
+    "@simrush/shared": "*",
+    "tsup": "^8.5.1",
+    "tsx": "^4.23.15"
+  }
+}
